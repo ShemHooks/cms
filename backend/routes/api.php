@@ -15,7 +15,7 @@ Route::controller(AuthController::class)->group(function(){
 });
 
 Route::controller(LocationController::class)->group(function(){
-    Route::get('getAllLatestLocations', 'getAllLatestLocations');
+    Route::get('getAllLatestLocations/{id}', 'getAllLatestLocations');
     Route::post('addLocation', 'addLocation');
     Route::put('updateLocation', 'updateLocation');
 });

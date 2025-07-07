@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\API;
 
+use App\Models\User;
 use App\Models\Location;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -51,15 +52,27 @@ class LocationController extends BaseController
         return $this->sendResponse($location, 'Location updated successfully.');
     }
 
-    public function getAllLatestLocations(): JsonResponse
-{
-    $latestLocations = \App\Models\Location::select('user_id', 'latitude', 'longitude', 'recorded_at')
-        ->orderBy('recorded_at', 'desc')
-        ->get()
-        ->unique('user_id') // Keep only the latest location per child
-        ->values(); // Reset collection keys
+    public function getAllLatestLocations(string $id): JsonResponse
+    {
+    
+    $parent = User::find($id);
+    
+    if (!$parent) {
+        return $this->sendError('Parent not found', 404);
+    }
 
-    return $this->sendResponse($latestLocations, 'All children latest locations.');
+   $locations = $parent->childrenLocation()
+                ->with('user:id,name')
+                ->orderByDesc('recorded_at')
+                ->get();
+
+
+    if($locations->isEmpty()){
+        return $this->sendError('No location found',404);
+    }
+
+    return $this->sendResponse($locations,'children location');
+
 }
 
     

@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 
 class User extends Authenticatable
 {
@@ -54,8 +56,18 @@ class User extends Authenticatable
         return $this->hasMany(User::class, 'parent_id');
     }
 
-        public function parent(): BelongsTo
+
+    public function childrenLocation()
     {
-        return $this->belongsTo(User::class, 'parent_id');
+        return $this->hasManyThrough(
+            Location::class,
+            User::class,
+            'parent_id',
+            'user_id',
+            'id',
+            'id'
+        );
     }
+
+    
 }
